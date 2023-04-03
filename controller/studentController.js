@@ -3,9 +3,9 @@ const jwt=require('jsonwebtoken')
 
 class Controller{
     add= async(req,res,next)=>{
-        const {name,age,motherMobile,fatherMobile,monthlyEarning,section,bus}= req.body
+        const {name,age,motherMobile,fatherMobile,gender,monthlyEarning,section,bus}= req.body
         try {
-            const user= await new Student({name,age,motherMobile,fatherMobile,monthlyEarning,section,bus}).save()
+            const user= await new Student({name,gender,age,motherMobile,fatherMobile,monthlyEarning,section,bus}).save()
             return res.status(200).json({success: true, msg: 'added successfuly'})
         } catch (error) {
             console.log(error)
@@ -13,9 +13,11 @@ class Controller{
         }
     }
     update= async(req,res,next)=>{
-        const {name,age,motherMobile,fatherMobile,monthlyEarning,section,bus}= req.body
+        console.log('000')
+        const {name,age,motherMobile,gender,fatherMobile,monthlyEarning,section,bus}= req.body
+        const {_id}=req.params
         try {
-            const user= await Student.findByIdAndUpdate({_id:_id},{name,age,motherMobile,fatherMobile,monthlyEarning,section,bus})
+            const user= await Student.findByIdAndUpdate({_id:_id},{name,gender,age,motherMobile,fatherMobile,monthlyEarning,section,bus})
             return res.status(200).json({success: true, msg: 'updated successfuly'})
         } catch (error) {
             console.log(error)
@@ -25,7 +27,7 @@ class Controller{
     deactivate= async (req,res,next)=>{
         const {_id}= req.params
         try {
-            const user= await Student.findByIdAndUpdate({_id:_id},{status:'deactive'})
+            const user= await Student.findByIdAndUpdate({_id:_id},{status:'deactive',updatedAt: Date()})
         } catch (error) {
             console.log(error)
             return res.status(500).json({success: false, msg: 'an error occur'})
@@ -35,6 +37,8 @@ class Controller{
 
         try {
            const students= await Student.aggregate([
+            { $match: { "status": "active" } },
+
             {$lookup:{
                 from: "sections",
                 foreignField: "_id",
@@ -56,6 +60,42 @@ class Controller{
         } catch (error) {
             console.log(error)
             return res.status(500).json({success: false, msg: "an error occur"})
+        }
+    }
+    getNumberOfStudent= async(req,res,next)=>{
+        try {
+            const user= await Student.find().count()
+            return res.status(200).json({success: true, msg: user})
+        } catch (error) {
+            console.log(error)
+            return res.status(500).json({success: false, msg: 'an error occur'})
+        }
+    }
+    getNumberOfGirls= async(req,res,next)=>{
+        try {
+            const user= await Student.find({gender:'female'}).count()
+            return res.status(200).json({success: true, msg: user})
+        } catch (error) {
+            console.log(error)
+            return res.status(500).json({success: false, msg: 'an error occur'})
+        }
+    }
+    getNumberOfKG1= async(req,res,next)=>{
+        try {
+            const user= await Student.find({age:'4'}).count()
+            return res.status(200).json({success: true, msg: user})
+        } catch (error) {
+            console.log(error)
+            return res.status(500).json({success: false, msg: 'an error occur'})
+        }
+    }
+    getNumberOfKG2= async(req,res,next)=>{
+        try {
+            const user= await Student.find({age:'5'}).count()
+            return res.status(200).json({success: true, msg: user})
+        } catch (error) {
+            console.log(error)
+            return res.status(500).json({success: false, msg: 'an error occur'})
         }
     }
 }

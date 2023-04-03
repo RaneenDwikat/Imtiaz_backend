@@ -28,6 +28,9 @@ const studentShcema= new mongoose.Schema({
         type: String,
         enum: ['active', 'deactive'],
         default: 'active'
+    },
+    gender:{
+        type: String
     }
     
 },{timestamps:true})
