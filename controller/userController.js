@@ -17,7 +17,7 @@ class Controller {
         let token = jwt.sign({ role: user.role, _id: user._id }, "secret");
         return res
           .status(200)
-          .json({ success: true, token: token, msg: "Authenticated" });
+          .json({ success: true, token: token, msg: "Authenticated" ,role: user.role,});
       }
     } catch (error) {
       console.log(error);
@@ -44,13 +44,11 @@ class Controller {
   };
   edit = async (req, res, next) => {
     const { email, password, role, name, mobile, section, salary } = req.body;
-    const token=req.headers.authorization?.replace("Bearer ", "");
-   
+   const {_id}=req.params
     try {
-      if(token){
-        const decode= await jwt.verify(token,'secret')
+     console.log(req.body.salary)
       const user = await User.findOneAndUpdate(
-        { _id: decode._id },
+        { _id: _id },
         {
           email: email,
           password: password,
@@ -61,7 +59,7 @@ class Controller {
           salary: salary,
         }
       );
-      return res.status(200).json({success:true,msg:'edited'})}
+      return res.status(200).json({success:true,msg:'edited'})
     } catch (error) {
       console.log(error);
       return res.status(500).json({ success: false, msg: error });
@@ -84,6 +82,36 @@ class Controller {
       const decoded=  jwt.verify(token,'secret')
       const user= await User.findOne({_id:decoded._id})
       return res.status(200).json({success: true, msg: 'getting user successfuly', data:user})
+
+    } catch (error) {
+      console.log(error)
+      return res.status(500).json({success: false, msg: 'something went wrong'})
+    }
+  }
+  getTeachers= async(req,res,next) =>{
+
+    try {
+      const user= await User.aggregate([
+        { $match: { "role": "teacher" } },
+
+        {$lookup:{
+            from: "sections",
+            foreignField: "_id",
+            localField: "section",
+            pipeline: [
+                {
+                  $project: {
+                    createdAt: 0,
+                    updatedAt: 0,
+                    __v: 0,
+                    status: 0,
+                  },
+                },
+              ],
+            as:"section"
+        }}
+       ])
+      return res.status(200).json({success: true, msg: 'getting teachers successfuly', data:user})
 
     } catch (error) {
       console.log(error)

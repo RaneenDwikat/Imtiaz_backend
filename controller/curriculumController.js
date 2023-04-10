@@ -33,6 +33,8 @@ class Controller{
     }
     getById= async(req,res,next)=>{
         try {
+          console.log(req.params.id)
+
             const file = await Curriculum.findById(req.params.id);
             const path = file.path;
             const fileName = file.name;
@@ -41,7 +43,7 @@ class Controller{
           
             res.setHeader('Content-disposition', `attachment; filename=${fileName}`);
             res.setHeader('Content-type', fileType);
-          
+            console.log(res)
             fileStream.pipe(res);
           } catch (err) {
             console.log('Error downloading file:', err);
@@ -76,6 +78,18 @@ class Controller{
             });
           }
     }
+    getFilesbySection= async(req,res,next)=>{
+      const {sectionId}=req.params
+      try {
+          const file =  await Curriculum.find({sectionId:sectionId})
+         return res.json({success: true, msg: file})
+        } catch (err) {
+          console.log('Error downloading file:', err);
+          res.status(500).json({
+            message: 'Error downloading file'
+          });
+        }
+  }
 }
 
 module.exports= Controller

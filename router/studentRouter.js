@@ -13,5 +13,6 @@ router.get('/getNumberOfStudent',controller.getNumberOfStudent)
 router.get('/getNumberOfGirls',controller.getNumberOfGirls)
 router.get('/getNumberOfKG1',controller.getNumberOfKG1)
 router.get('/getNumberOfKG2',controller.getNumberOfKG2)
- 
+router.get('/getBySection/:section',controller.getBySection)
+
 module.exports=router

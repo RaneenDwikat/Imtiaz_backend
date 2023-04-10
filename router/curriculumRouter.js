@@ -7,8 +7,9 @@ const router=express.Router()
 const controller= new curriculumController()
 
 router.get('/getFiles',controller.getFiles)
+router.get('/getFiles/:sectionId',controller.getFilesbySection)
 
-router.get('/download/:id',auth.authAssistant,controller.getById)
+router.get('/download/:id',controller.getById)
 router.put('/update/:id',auth.authAssistant,controller.updateById)
 router.delete('/delete/:id',auth.authAssistant,controller.deleteById)
 
